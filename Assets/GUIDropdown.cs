@@ -93,10 +93,18 @@ namespace GUIExtension
         {
             var optionStyle = skin_.FindStyle("dropdown_option");
             int newSelect = -1;
+
+            float offsetY = position.yMax;
+            float totalOptionHeight = position.height * options.Length;
+            if (offsetY + totalOptionHeight > Screen.height)
+            {
+                offsetY = position.yMin - totalOptionHeight;
+            }
+
             for (int i = 0; i < options.Length; i++)
             {
                 var optionPosition = position;
-                optionPosition.y += position.height * (1 + i);
+                optionPosition.y = offsetY + position.height * i;
                 string text = string.Format("{0}{1}", i == state.Select ? " ✓ " : " 　 ", options[i]);
                 if (GUI.Button(optionPosition, text, optionStyle))
                 {
@@ -156,7 +164,7 @@ namespace GUIExtension
             const float fadeTime = 0.1f;
             float dt = Time.time - state.CurrentStatusStartTime;
             float a = 1 - dt / fadeTime;
-            
+
             drawCaption(position, options, state);
 
             var prevColor = GUI.color;
