@@ -7,10 +7,10 @@
 
 ## What is this
 
-An implementation of dropdown for Unity script without  UI GameObject.  
+An implementation of dropdown for Unity script without GameObject.  
 There are GUI.Button(), GUI.Slider(), ... however **there is NOT GUI.Dropdown()**
 
-We implemented **GUIEx.Dropdown()**.
+Therefore, we implemented **GUIEx.Dropdown()**.
 
 
 ## How to use
