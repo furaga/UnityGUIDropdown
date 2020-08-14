@@ -1354,19 +1354,19 @@ MonoBehaviour:
     m_StretchWidth: 1
     m_StretchHeight: 0
   m_CustomStyles:
-  - m_Name: Dropdown
+  - m_Name: dropdown_option
     m_Normal:
-      m_Background: {fileID: 0}
+      m_Background: {fileID: 2800000, guid: af0a3e1e80000d842ba70fd044a37ed9, type: 3}
       m_ScaledBackgrounds: []
-      m_TextColor: {r: 0, g: 0, b: 0, a: 0}
+      m_TextColor: {r: 0.06666667, g: 0.06666667, b: 0.06666667, a: 1}
     m_Hover:
-      m_Background: {fileID: 0}
+      m_Background: {fileID: 2800000, guid: 680fd88ba0dee794cb0e2d8bd407590a, type: 3}
       m_ScaledBackgrounds: []
-      m_TextColor: {r: 0, g: 0, b: 0, a: 0}
+      m_TextColor: {r: 0.06666667, g: 0.06666667, b: 0.06666667, a: 1}
     m_Active:
-      m_Background: {fileID: 0}
+      m_Background: {fileID: 2800000, guid: cbf073b59e40fb043a8c0f91c23b55c1, type: 3}
       m_ScaledBackgrounds: []
-      m_TextColor: {r: 0, g: 0, b: 0, a: 0}
+      m_TextColor: {r: 0.06666667, g: 0.06666667, b: 0.06666667, a: 1}
     m_Focused:
       m_Background: {fileID: 0}
       m_ScaledBackgrounds: []
@@ -1410,7 +1410,7 @@ MonoBehaviour:
     m_Font: {fileID: 0}
     m_FontSize: 0
     m_FontStyle: 0
-    m_Alignment: 0
+    m_Alignment: 3
     m_WordWrap: 0
     m_RichText: 0
     m_TextClipping: 0
