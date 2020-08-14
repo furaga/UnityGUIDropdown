@@ -7,12 +7,17 @@ namespace GUIExtension
     public static class GUIEx
     {
         static Texture2D buttonTexture_ = null;
+        static GUISkin skin_ = null;
 
         public static void setup()
         {
             if (buttonTexture_ == null)
             {
                 buttonTexture_ = Resources.Load<Texture2D>("dropdown_button");
+            }
+            if (skin_ == null)
+            {
+                skin_ = Resources.Load<GUISkin>("Dropdown");
             }
         }
 
@@ -34,6 +39,10 @@ namespace GUIExtension
         {
             setup();
 
+            var orgSkin = GUI.skin;
+
+            GUI.skin = skin_;
+
             switch (state.CurrentStatus)
             {
                 case DropdownState.Status.Closed:
@@ -46,6 +55,7 @@ namespace GUIExtension
                     return closingDropdown(position, options, state);
             }
 
+            GUI.skin = orgSkin;
             return state;
         }
 
@@ -77,9 +87,13 @@ namespace GUIExtension
             state.CurrentStatus = DropdownState.Status.Opened;
             return state;
         }
+
         static DropdownState openedDropdown(Rect position, string[] options, DropdownState state)
         {
-            drawCaption(position, options, state);
+            if (drawCaption(position, options, state))
+            {
+                state.CurrentStatus = DropdownState.Status.Closing;
+            }
             int newSelect = drawDropdownList(position, options, state);
             if (newSelect >= 0)
             {
@@ -91,13 +105,14 @@ namespace GUIExtension
 
         static int drawDropdownList(Rect position, string[] options, DropdownState state)
         {
+            var optionStyle = skin_.FindStyle("dropdown_option");
             int newSelect = -1;
             for (int i = 0; i < options.Length; i++)
             {
                 var optionPosition = position;
                 optionPosition.y += position.height * (1 + i);
-                string text = string.Format("{0}\t{1}", i == state.Select ? "✓" : " ", options[i]);
-                if (GUI.Button(optionPosition, text))
+                string text = string.Format("{0}{1}", i == state.Select ? " ✓ " : " 　 ", options[i]);
+                if (GUI.Button(optionPosition, text, optionStyle))
                 {
                     newSelect = i;
                 }
