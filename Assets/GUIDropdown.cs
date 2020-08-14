@@ -8,18 +8,26 @@ namespace GUIExtension
     {
         public class DropdownState
         {
-            public enum Status
+            /// <summary>
+            /// Index of selected option 
+            /// </summary>
+            public int Select = 0;
+            /// <summary>
+            /// Text of caption
+            /// </summary>
+            public string Caption = "";
+
+            // Used internally
+            public enum status
             {
                 Closed,
                 Opening,
                 Opened,
                 Closing,
-            }
-            public int Select = 0;
-            public int NextSelect = 0;
-            public string Caption = "";
-            private Status currentStatus_ = Status.Closed;
-            public Status CurrentStatus
+            }            
+            public int nextSelect = 0;
+            private status currentStatus_ = status.Closed;
+            public status currentStatus
             {
                 get
                 {
@@ -28,19 +36,34 @@ namespace GUIExtension
                 set
                 {
                     currentStatus_ = value;
-                    CurrentStatusStartTime = Time.time;
+                    currentStatusStartTime = Time.time;
                 }
             }
-            public float CurrentStatusStartTime { get; private set; }
+            public float currentStatusStartTime { get; private set; }
         }
 
 
         public class DropdownStyles
         {
+            /// <summary>
+            /// GUIStyle for caption label
+            /// </summary>
             public GUIStyle Caption;
+            /// <summary>
+            /// GUIStyle for options
+            /// </summary>
             public GUIStyle Option;
+            /// <summary>
+            /// Color of arrow
+            /// </summary>
             public Color ArrowColor = new Color(0.5f, 0.5f, 0.5f);
+            /// <summary>
+            /// Size of arrow
+            /// </summary>
             public int ArrowSize = 16;
+            /// <summary>
+            /// Right margin of arrow
+            /// </summary>
             public int ArrowMargin = 8;
 
             public DropdownStyles(GUIStyle caption, GUIStyle option)
@@ -88,15 +111,15 @@ namespace GUIExtension
                 styles = defaultDropdownStyles_;
             }
 
-            switch (state.CurrentStatus)
+            switch (state.currentStatus)
             {
-                case DropdownState.Status.Closed:
+                case DropdownState.status.Closed:
                     return closedDropdown(position, options, state, styles);
-                case DropdownState.Status.Opening:
+                case DropdownState.status.Opening:
                     return openingDropdown(position, options, state, styles);
-                case DropdownState.Status.Opened:
+                case DropdownState.status.Opened:
                     return openedDropdown(position, options, state, styles);
-                case DropdownState.Status.Closing:
+                case DropdownState.status.Closing:
                     return closingDropdown(position, options, state, styles);
             }
 
@@ -107,7 +130,7 @@ namespace GUIExtension
         {
             if (drawCaption(position, options, state, styles))
             {
-                state.CurrentStatus = DropdownState.Status.Opening;
+                state.currentStatus = DropdownState.status.Opening;
             }
             return state;
         }
@@ -116,7 +139,7 @@ namespace GUIExtension
         {
             const float fadeTime = 0.1f;
 
-            float dt = Time.time - state.CurrentStatusStartTime;
+            float dt = Time.time - state.currentStatusStartTime;
             drawCaption(position, options, state, styles);
 
             var prevColor = GUI.color;
@@ -126,7 +149,7 @@ namespace GUIExtension
 
             if (dt >= fadeTime)
             {
-                state.CurrentStatus = DropdownState.Status.Opened;
+                state.currentStatus = DropdownState.status.Opened;
             }
             return state;
         }
@@ -135,13 +158,13 @@ namespace GUIExtension
         {
             if (drawCaption(position, options, state, styles))
             {
-                state.CurrentStatus = DropdownState.Status.Closing;
+                state.currentStatus = DropdownState.status.Closing;
             }
             int newSelect = drawDropdownList(position, options, state, styles);
             if (newSelect >= 0)
             {
-                state.NextSelect = newSelect;
-                state.CurrentStatus = DropdownState.Status.Closing;
+                state.nextSelect = newSelect;
+                state.currentStatus = DropdownState.status.Closing;
             }
             return state;
         }
@@ -150,7 +173,7 @@ namespace GUIExtension
         {
             const float fadeTime = 0.1f;
 
-            float dt = Time.time - state.CurrentStatusStartTime;
+            float dt = Time.time - state.currentStatusStartTime;
             drawCaption(position, options, state, styles);
 
             var prevColor = GUI.color;
@@ -160,8 +183,8 @@ namespace GUIExtension
 
             if (dt >= fadeTime)
             {
-                state.Select = state.NextSelect;
-                state.CurrentStatus = DropdownState.Status.Closed;
+                state.Select = state.nextSelect;
+                state.currentStatus = DropdownState.status.Closed;
             }
             return state;
         }
