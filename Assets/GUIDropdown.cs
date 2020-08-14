@@ -31,8 +31,22 @@ namespace GUIExtension
                 Closing,
             }
             public int Select = 0;
+            public int NextSelect = 0;
             public string Caption = "";
-            public Status CurrentStatus = Status.Closed;
+            private Status currentStatus_ = Status.Closed;
+            public Status CurrentStatus
+            {
+                get
+                {
+                    return currentStatus_;
+                }
+                set
+                {
+                    currentStatus_ = value;
+                    CurrentStatusStartTime = Time.time;
+                }
+            }
+            public float CurrentStatusStartTime { get; private set; }
         }
 
         public static DropdownState Dropdown(Rect position, string[] options, DropdownState state)
@@ -59,16 +73,6 @@ namespace GUIExtension
             return state;
         }
 
-        static DropdownState closedDropdown(Rect position, string[] options, DropdownState state)
-        {
-            if (drawCaption(position, options, state))
-            {
-                state.CurrentStatus = DropdownState.Status.Opening;
-            }
-
-            return state;
-        }
-
         static bool drawCaption(Rect position, string[] options, DropdownState state)
         {
             if (0 <= state.Select && state.Select < options.Length)
@@ -76,31 +80,13 @@ namespace GUIExtension
                 state.Caption = options[state.Select];
             }
             bool pushed = GUI.Button(position, state.Caption);
-            var texRect = new Rect(position.xMax - 16, position.y, 16, position.height);
+            var texRect = new Rect(position.xMax - 24, position.center.y - 8, 16, 16);
+
+            var prevColor = GUI.color;
+            GUI.color = new Color(0.5f, 0.5f, 0.5f);
             GUI.DrawTexture(texRect, buttonTexture_);
+            GUI.color = prevColor;
             return pushed;
-        }
-
-        static DropdownState openingDropdown(Rect position, string[] options, DropdownState state)
-        {
-            drawCaption(position, options, state);
-            state.CurrentStatus = DropdownState.Status.Opened;
-            return state;
-        }
-
-        static DropdownState openedDropdown(Rect position, string[] options, DropdownState state)
-        {
-            if (drawCaption(position, options, state))
-            {
-                state.CurrentStatus = DropdownState.Status.Closing;
-            }
-            int newSelect = drawDropdownList(position, options, state);
-            if (newSelect >= 0)
-            {
-                state.Select = newSelect;
-                state.CurrentStatus = DropdownState.Status.Closing;
-            }
-            return state;
         }
 
         static int drawDropdownList(Rect position, string[] options, DropdownState state)
@@ -120,10 +106,69 @@ namespace GUIExtension
             return newSelect;
         }
 
+        static DropdownState closedDropdown(Rect position, string[] options, DropdownState state)
+        {
+            if (drawCaption(position, options, state))
+            {
+                state.CurrentStatus = DropdownState.Status.Opening;
+            }
+
+            return state;
+        }
+
+        static DropdownState openingDropdown(Rect position, string[] options, DropdownState state)
+        {
+            const float fadeTime = 0.1f;
+            float dt = Time.time - state.CurrentStatusStartTime;
+            float a = dt / fadeTime;
+
+            drawCaption(position, options, state);
+
+            var prevColor = GUI.color;
+            GUI.color = new Color(1, 1, 1, a);
+            drawDropdownList(position, options, state);
+            GUI.color = prevColor;
+
+            if (dt >= fadeTime)
+            {
+                state.CurrentStatus = DropdownState.Status.Opened;
+            }
+            return state;
+        }
+
+        static DropdownState openedDropdown(Rect position, string[] options, DropdownState state)
+        {
+            if (drawCaption(position, options, state))
+            {
+                state.CurrentStatus = DropdownState.Status.Closing;
+            }
+            int newSelect = drawDropdownList(position, options, state);
+            if (newSelect >= 0)
+            {
+                state.NextSelect = newSelect;
+                state.CurrentStatus = DropdownState.Status.Closing;
+            }
+            return state;
+        }
+
         static DropdownState closingDropdown(Rect position, string[] options, DropdownState state)
         {
+            const float fadeTime = 0.1f;
+            float dt = Time.time - state.CurrentStatusStartTime;
+            float a = 1 - dt / fadeTime;
+            
             drawCaption(position, options, state);
-            state.CurrentStatus = DropdownState.Status.Closed;
+
+            var prevColor = GUI.color;
+            GUI.color = new Color(1, 1, 1, a);
+            drawDropdownList(position, options, state);
+            GUI.color = prevColor;
+
+            if (dt >= fadeTime)
+            {
+                state.Select = state.NextSelect;
+                state.CurrentStatus = DropdownState.Status.Closed;
+            }
             return state;
         }
     }
